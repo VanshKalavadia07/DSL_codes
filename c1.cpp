@@ -62,6 +62,8 @@ class Stack
         cout<<books[i]<<endl;
         }
     }
+    
+};
     int main()
     {
         Stack s;
@@ -111,4 +113,3 @@ class Stack
         
         return 0;
     }
-};
