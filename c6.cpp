@@ -1,9 +1,8 @@
 #include <iostream>
 #include <queue>
-
+#include <algorithm>
 using namespace std;
 
-// Definition of BST Node
 struct Node {
     int data;
     Node* left;
@@ -16,65 +15,78 @@ struct Node {
     }
 };
 
-// Function to insert a node into the BST
 Node* insert(Node* root, int val) {
     if (root == nullptr) {
         return new Node(val);
     }
+
     if (val < root->data) {
         root->left = insert(root->left, val);
-    } else {
+    } else if (val > root->data) {
         root->right = insert(root->right, val);
     }
+
     return root;
 }
 
-// 1. Level-wise traversal (Breadth-First Search)
 void printLevelOrder(Node* root) {
-    if (root == nullptr) return;
+    if (root == nullptr) {
+        cout << "Tree is empty." << endl;
+        return;
+    }
 
     queue<Node*> q;
     q.push(root);
 
     while (!q.empty()) {
         int levelSize = q.size();
+
         while (levelSize > 0) {
             Node* curr = q.front();
             q.pop();
+
             cout << curr->data << " ";
 
-            if (curr->left != nullptr) q.push(curr->left);
-            if (curr->right != nullptr) q.push(curr->right);
+            if (curr->left != nullptr) {
+                q.push(curr->left);
+            }
+
+            if (curr->right != nullptr) {
+                q.push(curr->right);
+            }
+
             levelSize--;
         }
-        cout << "| "; // Separator for different levels
+
+        cout << endl;
     }
-    cout << endl;
 }
 
-// 2. Calculate the height of the tree
+Node* copyTree(Node* root) {
+    if (root == nullptr) {
+        return nullptr;
+    }
+
+    Node* newNode = new Node(root->data);
+    newNode->left = copyTree(root->left);
+    newNode->right = copyTree(root->right);
+
+    return newNode;
+}
+
 int getHeight(Node* root) {
-    if (root == nullptr) return -1; // Returns -1 if height is edge-based, 0 if node-based
-    return 1 + max(getHeight(root->left), getHeight(root->right));
+    if (root == nullptr) {
+        return -1;
+    }
+
+    return 1 + max(getHeight(root->left),
+                   getHeight(root->right));
 }
 
-// 3. Mirror the tree (Invert left and right children)
-void mirrorTree(Node* root) {
-    if (root == nullptr) return;
-
-    // Swap left and right child pointers
-    Node* temp = root->left;
-    root->left = root->right;
-    root->right = temp;
-
-    // Recur for subtrees
-    mirrorTree(root->left);
-    mirrorTree(root->right);
-}
-
-// 4. Print all leaf nodes
 void printLeafNodes(Node* root) {
-    if (root == nullptr) return;
+    if (root == nullptr) {
+        return;
+    }
 
     if (root->left == nullptr && root->right == nullptr) {
         cout << root->data << " ";
@@ -87,34 +99,47 @@ void printLeafNodes(Node* root) {
 
 int main() {
     Node* root = nullptr;
+    Node* newRoot = nullptr;
     int n, val;
 
-    cout << "Enter the number of nodes to insert: ";
+    cout << "Enter the number of employee IDs: ";
     cin >> n;
 
-    cout << "Enter " << n << " values to build the BST:\n";
+    if (n < 0) {
+        cout << "Invalid number of employee IDs." << endl;
+        return 0;
+    }
+
+    cout << "Enter " << n << " employee IDs:" << endl;
+
     for (int i = 0; i < n; i++) {
         cin >> val;
         root = insert(root, val);
     }
 
-    cout << "\n--- Binary Search Tree Details ---\n";
-   
-    cout << "Level-wise Traversal: ";
+    cout << "\nOriginal BST (Level Order):" << endl;
     printLevelOrder(root);
 
-    cout << "Height of the Tree: " << getHeight(root) << endl;
+    newRoot = copyTree(root);
+
+    cout << "\nCopied BST (Level Order):" << endl;
+    printLevelOrder(newRoot);
+
+    if (root == nullptr) {
+        cout << "\nHeight of BST: -1 (Empty tree)" << endl;
+    } else {
+        cout << "\nHeight of BST: " << getHeight(root) << endl;
+    }
 
     cout << "Leaf Nodes: ";
-    printLeafNodes(root);
+
+    if (root == nullptr) {
+        cout << "None";
+    } else {
+        printLeafNodes(root);
+    }
+
     cout << endl;
-
-    cout << "Mirroring the tree...\n";
-    mirrorTree(root);
-
-    cout << "Level-wise Traversal of Mirror Tree: ";
-    printLevelOrder(root);
 
     return 0;
 }
-
